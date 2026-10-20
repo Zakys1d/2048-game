@@ -1,3 +1,332 @@
+$tile-colors: (
+  2: #eee4da,
+  4: #ede0c8,
+  8: #f2b179,
+  16: #f59563,
+  32: #f67c5f,
+  64: #f65e3b,
+  128: #edcf72,
+  256: #edcc61,
+  512: #edc850,
+  1024: #edc53f,
+  2048: #edc22e,
+);
+$bg: #faf8ef;
+$board: #bbada0;
+$cell: #cdc1b4;
+$text: #776e65;
+$light: #f9f6f2;
+$button: #8f7a66;
+$cell-size: 75px;
+$gap: 10px;
+$step: $cell-size + $gap;
+$move-time: 0.12s;
+
+@keyframes appear {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes merge {
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes shake {
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes remove {
+  to {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes shuffle {
+  50% {
+    transform: rotate(180deg) scale(0.6);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bump {
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
   margin: 0;
+  background: $bg;
+  color: $text;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 350px;
+  padding: 20px 0;
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin: 0;
+  color: $text;
+  font-size: 48px;
+  line-height: 1;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 75px;
+  height: 56px;
+  margin: 0;
+  background: $board;
+  border-radius: 6px;
+  color: #eee4da;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.game-score {
+  color: #fff;
+  font-size: 20px;
+
+  &.bump {
+    animation: bump 0.25s ease;
+  }
+}
+
+.button {
+  width: 75px;
+  height: 56px;
+  background: $button;
+  border: none;
+  border-radius: 6px;
+  color: $light;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #9f8a76;
+  }
+}
+
+.board {
+  position: relative;
+
+  &.shake {
+    animation: shake 0.25s ease;
+  }
+}
+
+.game-field {
+  background: $board;
+  border-radius: 6px;
+  border-spacing: $gap;
+}
+
+.field-cell {
+  width: $cell-size;
+  height: $cell-size;
+  background: $cell;
+  border-radius: 4px;
+}
+
+.tiles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: $cell-size;
+  height: $cell-size;
+  transform: translate(
+    calc(#{$gap} + var(--col) * #{$step}),
+    calc(#{$gap} + var(--row) * #{$step})
+  );
+  transition: transform $move-time ease-in-out;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    color: $light;
+    font-size: 30px;
+    user-select: none;
+  }
+
+  @each $value, $color in $tile-colors {
+    &--#{$value} .tile__inner {
+      background: $color;
+    }
+  }
+
+  &--2 .tile__inner,
+  &--4 .tile__inner {
+    color: $text;
+  }
+
+  &--128 .tile__inner,
+  &--256 .tile__inner,
+  &--512 .tile__inner {
+    font-size: 26px;
+  }
+
+  &--1024 .tile__inner,
+  &--2048 .tile__inner {
+    font-size: 21px;
+  }
+
+  &--new .tile__inner {
+    animation: appear 0.2s ease;
+  }
+
+  &--merged .tile__inner {
+    animation: merge 0.2s ease;
+  }
+
+  &--shuffled .tile__inner {
+    animation: shuffle 0.45s ease;
+  }
+
+  &--removed .tile__inner {
+    animation: remove 0.3s ease forwards;
+  }
+}
+
+.board.deleting .tile:not(.tile--removed) {
+  cursor: pointer;
+  pointer-events: auto;
+
+  .tile__inner {
+    outline: 3px dashed #f65e3b;
+    outline-offset: -4px;
+  }
+}
+
+.abilities {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.ability {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: $button;
+  border: none;
+  border-radius: 6px;
+  color: $light;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  &:hover:not(:disabled) {
+    background: #9f8a76;
+  }
+
+  &.active {
+    background: #f65e3b;
+  }
+
+  &__name {
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  &__charges {
+    font-size: 16px;
+  }
+}
+
+.message-container {
+  width: 100%;
+  height: 100px;
+  margin-top: 20px;
+}
+
+.message {
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  background: $board;
+  border-radius: 6px;
+  color: $light;
+  font-size: 17px;
+  text-align: center;
+}
+
+.message-win {
+  background: #edc22e;
+}
+
+.message-lose {
+  background: #f65e3b;
+}
+
+.hidden {
+  display: none;
 }
