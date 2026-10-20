@@ -2,6 +2,8 @@
 
 Browser implementation of the classic [2048](https://en.wikipedia.org/wiki/2048_(video_game)) puzzle, built with plain JavaScript, SCSS and [Parcel](https://parceljs.org/) (via `@mate-academy/scripts`).
 
+[DEMO LINK](https://zakys1d.github.io/2048-game/)
+
 ## How to play
 
 1. Press **Start** to place the first tile.
