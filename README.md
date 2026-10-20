@@ -56,7 +56,3 @@ src/
 | `shuffle()` / `deleteTile(row, col)` / `undo()` | Abilities, 3 charges each per game; return `true` if used |
 | `getAbilityCharges(name)` | Remaining charges of `shuffle`, `delete` or `undo` |
 | `checkWin()` / `checkLose()` | Check for a 2048 tile / no moves left |
-
-## Troubleshooting
-
-- **`npm start` fails with "Browser scripts cannot have imports or exports"** — the script must be loaded as a module: `<script type="module" src="scripts/main.js"></script>` in `src/index.html`.
